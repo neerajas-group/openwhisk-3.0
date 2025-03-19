@@ -453,6 +453,7 @@ trait WhiskActionsApi extends WhiskCollectionAPI with PostActionActivation with 
         l.timeout getOrElse TimeLimit(),
         l.memory getOrElse MemoryLimit(),
         l.cpu getOrElse CpuLimit(),
+        l.network getOrElse NetworkLimit(),
         l.logs getOrElse LogLimit(),
         l.concurrency getOrElse ConcurrencyLimit())
     } getOrElse ActionLimits()
@@ -546,6 +547,7 @@ trait WhiskActionsApi extends WhiskCollectionAPI with PostActionActivation with 
         l.timeout getOrElse action.limits.timeout,
         l.memory getOrElse action.limits.memory,
         l.cpu getOrElse action.limits.cpu,
+        l.network getOrElse action.limits.network,
         l.logs getOrElse action.limits.logs,
         l.concurrency getOrElse action.limits.concurrency)
     } getOrElse action.limits

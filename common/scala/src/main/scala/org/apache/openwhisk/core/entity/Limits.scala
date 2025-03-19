@@ -51,6 +51,7 @@ protected[entity] abstract class Limits {
 protected[core] case class ActionLimits(timeout: TimeLimit = TimeLimit(),
                                         memory: MemoryLimit = MemoryLimit(),
                                         cpu: CpuLimit = CpuLimit(),
+                                        network: NetworkLimit = NetworkLimit()
                                         logs: LogLimit = LogLimit(),
                                         concurrency: ConcurrencyLimit = ConcurrencyLimit())
     extends Limits {
@@ -67,7 +68,7 @@ protected[core] case class TriggerLimits protected[core] () extends Limits {
 protected[core] object ActionLimits extends ArgNormalizer[ActionLimits] with DefaultJsonProtocol {
 
   override protected[core] implicit val serdes = new RootJsonFormat[ActionLimits] {
-    val helper = jsonFormat5(ActionLimits.apply)
+    val helper = jsonFormat6(ActionLimits.apply)
 
     def read(value: JsValue) = {
       val obj = Try {
@@ -77,10 +78,11 @@ protected[core] object ActionLimits extends ArgNormalizer[ActionLimits] with Def
       val time = TimeLimit.serdes.read(obj.get("timeout") getOrElse deserializationError("'timeout' is missing"))
       val memory = MemoryLimit.serdes.read(obj.get("memory") getOrElse deserializationError("'memory' is missing"))
       val cpu = CpuLimit.serdes.read(obj.get("cpu") getOrElse deserializationError("'cpu' is missing"))
+      val network = NetworkLimit.serdes.read(obj.get("network") getOrElse deserializationError("'network' is missing"))
       val logs = obj.get("logs") map { LogLimit.serdes.read(_) } getOrElse LogLimit()
       val concurrency = obj.get("concurrency") map { ConcurrencyLimit.serdes.read(_) } getOrElse ConcurrencyLimit()
 
-      ActionLimits(time, memory, cpu, logs, concurrency)
+      ActionLimits(time, memory, cpu, network, logs, concurrency)
     }
 
     def write(a: ActionLimits) = helper.write(a)

@@ -193,6 +193,7 @@ class Controller(val instance: ControllerInstanceId,
     TimeLimit.config,
     MemoryLimit.config,
     CpuLimit.config,
+    NetworkLimit.config,
     LogLimit.config,
     runtimes,
     List(apiV1.basepath()))
@@ -255,6 +256,7 @@ object Controller {
                    timeLimit: TimeLimitConfig,
                    memLimit: MemoryLimitConfig,
                    cpuLimit: CpuLimitConfig,
+                   networkLimit: NetworkLimitConfig,
                    logLimit: MemoryLimitConfig,
                    runtimes: Runtimes,
                    apis: List[String]) =
@@ -275,6 +277,8 @@ object Controller {
         "max_action_memory" -> memLimit.max.toBytes.toJson,
         "min_action_cpu" -> cpuLimit.min.toInt.toJson,
         "max_action_cpu" -> cpuLimit.max.toInt.toJson,
+        "min_action_network" -> networkLimit.min.toInt.toJson,
+        "max_action_network" -> networkLimit.max.toInt.toJson,
         "min_action_logs" -> logLimit.min.toBytes.toJson,
         "max_action_logs" -> logLimit.max.toBytes.toJson),
       "runtimes" -> runtimes.toJson)
