@@ -50,6 +50,9 @@ case class ContainerAddress(host: String, port: Int = 8080) {
   require(host.nonEmpty, "ContainerIp must not be empty")
   def asString() = s"${host}:${port}"
 }
+case class ContainerPid(asString: String) {
+  require(asString.nonEmpty, "ContainerPid must not be empty")
+}
 
 object Container {
 

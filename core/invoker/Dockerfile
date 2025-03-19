@@ -27,6 +27,12 @@ ENV UID=1001 \
 
 RUN apk add --update openssl
 
+# Prasoon - Rate limiting packages installed in Invoker container
+RUN apt -y install \
+    iproute2 \
+    libnl-3-dev \
+    libmnl-dev 
+
 # Uncomment to fetch latest version of docker instead: RUN wget -qO- https://get.docker.com | sh
 # Install docker client
 RUN curl -sSL -o docker-${DOCKER_VERSION}.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz && \
@@ -40,6 +46,9 @@ ADD build/distributions/invoker.tar ./
 
 COPY init.sh /
 RUN chmod +x init.sh
+
+# Prasoon - rate limiting 
+COPY ratelimit_docker.out
 
 # When running the invoker as a non-root user this has implications on the standard directory where runc stores its data.
 # The non-root user should have access on the directory and corresponding permission to make changes on it.

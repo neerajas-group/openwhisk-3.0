@@ -437,6 +437,7 @@
 
 - name: start invoker
   docker_container:
+    network_mode: "host"
     userns_mode: "host"
     pid_mode: "host"
     privileged: "yes"
@@ -449,6 +450,9 @@
     env: "{{ env }}"
     volumes: "{{ volumes }}"
     ports: "{{ invoker_ports_to_expose }}"
+    capabilities:
+      - NET_ADMIN
+      - NET_RAW
     command: /bin/sh -c "exec /init.sh --id {{ invoker_index }} --uniqueName {{ invoker_index }} >> /logs/{{ invoker_name }}_logs.log 2>&1"
   when: not lean
 

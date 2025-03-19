@@ -250,6 +250,7 @@ class ContainerProxy(factory: (TransactionId,
                                Boolean,
                                ByteSize,
                                Int,
+                               Int,
                                Option[ExecutableWhiskAction]) => Future[Container],
                      sendActiveAck: ActiveAck,
                      storeActivation: (TransactionId, WhiskActivation, Boolean, UserContext) => Future[Any],
@@ -303,6 +304,7 @@ class ContainerProxy(factory: (TransactionId,
       logging.info(this, s"Cold start - Prasoon Log")
       logging.info(this, s"Job contains the following: (${job.action})")
       logging.info(this, s"Job contains the following: (${job.msg})")
+      logging.info(this, s"Job contains the following limits: (${job.action.limits})")
       // create a new container
       val container = factory(
         job.msg.transid,
@@ -1021,6 +1023,7 @@ object ContainerProxy {
                       ImageName,
                       Boolean,
                       ByteSize,
+                      Int,
                       Int,
                       Option[ExecutableWhiskAction]) => Future[Container],
             ack: ActiveAck,

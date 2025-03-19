@@ -38,6 +38,7 @@ import org.apache.openwhisk.common.{Logging, LoggingMarkers, TransactionId}
 import org.apache.openwhisk.core.ConfigKeys
 import org.apache.openwhisk.core.containerpool.ContainerId
 import org.apache.openwhisk.core.containerpool.ContainerAddress
+import org.apache.openwhisk.core.containerpool.ContainerPid
 
 import scala.concurrent.duration.Duration
 
@@ -171,6 +172,20 @@ class DockerClient(dockerHost: Option[String] = None,
       case "<no value>" => Future.failed(new NoSuchElementException)
       case stdout       => Future.successful(ContainerAddress(stdout))
     }
+  
+  def getPid(id: ContainerId)(implicit transid: TransactionId): Future[ContainerPid] =
+    runCmd(
+      Seq("inspect", "--format", s"{{.State.Pid}}", id.asString),
+      config.timeouts.inspect).flatMap{
+      case "<no value>" => Future.failed(new NoSuchElementException)
+      case stdout       => Future.successful(ContainerPid(stdout))
+    }
+  
+  def rateLimit(pid: ContainerPid, networkBW: Int) =
+    executeProcess(
+      Seq("bash", "ratelimit_docker.out", pid.asString, networkBW)
+    )
+    // TODO: SIDHARTH, add logic here to handle successful and failure case based on output of the rate limiting C file.
 
   def pause(id: ContainerId)(implicit transid: TransactionId): Future[Unit] =
     runCmd(Seq("pause", id.asString), config.timeouts.pause).map(_ => ())

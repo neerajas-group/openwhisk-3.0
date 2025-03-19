@@ -81,9 +81,30 @@ object DockerContainer {
       case (key, value) => Seq("-e", s"$key=$value")
     }
 
+    log.info(this, s"Creating Container in DockerContainer - Prasoon Logging")
+    log.info(
+      this,
+      s"TID: $tid, " +
+        s"Image: $image, " +
+        s"RegistryConfig: $registryConfig, " +
+        s"Memory: $memory, " +
+        s"CPUShares: $cpuShares, " +
+        s"Environment: $environment, " +
+        s"Network: $network, " +
+        s"DNS Servers: $dnsServers, " +
+        s"DNS Search: $dnsSearch, " +
+        s"DNS Options: $dnsOptions, " +
+        s"Name: $name, " +
+        s"UseRunc: $useRunc, " +
+        s"DockerRunParameters: $dockerRunParameters"
+    )
+
     val params = dockerRunParameters.flatMap {
       case (key, valueList) => valueList.toList.flatMap(Seq(key, _))
     }
+
+    val final_network = network.split("::")(0)
+    val networkBW = network.split("::")(1)
 
     // NOTE: --dns-option on modern versions of docker, but is --dns-opt on docker 1.12
     val dnsOptString = if (docker.clientVersion.startsWith("1.12")) { "--dns-opt" } else { "--dns-option" }
@@ -96,7 +117,7 @@ object DockerContainer {
       "--memory-swap",
       s"${memory.toMB}m",
       "--network",
-      network) ++
+      final_network) ++
       environmentArgs ++
       dnsServers.flatMap(d => Seq("--dns", d)) ++
       dnsSearch.flatMap(d => Seq("--dns-search", d)) ++
@@ -145,6 +166,16 @@ object DockerContainer {
           } else {
             Future.failed(BlackboxStartupError(Messages.imagePullError(imageToUse)))
           }
+      }
+      pid <- docker.getPid(id).recoverWith{
+        // remove the container immediately if inspect failed as
+        // container not having PID suggests container isn't working
+        case _ =>
+          docker.rm(id)
+          Future.failed(WhiskContainerStartupError(Messages.resourceProvisionError))
+      }
+      status <- docker.rateLimit(pid, networkBW) {
+        // TODO -- SIDHARTH, add case handling here depending on C file.
       }
       ip <- docker.inspectIPAddress(id, network).recoverWith {
         // remove the container immediately if inspect failed as
