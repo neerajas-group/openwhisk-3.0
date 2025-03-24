@@ -51,7 +51,7 @@ protected[entity] abstract class Limits {
 protected[core] case class ActionLimits(timeout: TimeLimit = TimeLimit(),
                                         memory: MemoryLimit = MemoryLimit(),
                                         cpu: CpuLimit = CpuLimit(),
-                                        network: NetworkLimit = NetworkLimit()
+                                        network: NetworkLimit = NetworkLimit(),
                                         logs: LogLimit = LogLimit(),
                                         concurrency: ConcurrencyLimit = ConcurrencyLimit())
     extends Limits {
