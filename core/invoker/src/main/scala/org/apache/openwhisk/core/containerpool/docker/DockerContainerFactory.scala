@@ -65,7 +65,7 @@ class DockerContainerFactory(instance: InvokerInstanceId,
                                cpuShares: Int,
                                networkBW: Int)(implicit config: WhiskConfig, logging: Logging): Future[Container] = {
     logging.info(this, s"Creating Container in DCF - Prasoon Logging")
-    logging.info(this, s"TID: $tid, Name: $name, ActionImage: $actionImage, UserProvidedImage: $userProvidedImage, Memory: $memory, CPUShares: $cpuShares, Bandwidth: $bandwidth")
+    logging.info(this, s"TID: $tid, Name: $name, ActionImage: $actionImage, UserProvidedImage: $userProvidedImage, Memory: $memory, CPUShares: $cpuShares, Bandwidth: $networkBW")
     val registryConfig =
       ContainerFactory.resolveRegistryConfig(userProvidedImage, runtimesRegistryConfig, userImagesRegistryConfig)
     val image = if (userProvidedImage) Left(actionImage) else Right(actionImage)
@@ -78,7 +78,7 @@ class DockerContainerFactory(instance: InvokerInstanceId,
       // environment = Map("__OW_API_HOST" -> config.wskApiHost) ++ containerArgsConfig.extraEnvVarMap,
       environment = Map("__OW_API_HOST" -> config.wskApiHost) ++ containerArgsConfig.extraEnvVarMap ++ Map("__ALLOCATED_BANDWIDTH" -> s"${networkBW}"),
       // network = containerArgsConfig.network,
-      network = s"${containerArgs.network}::${networkBW}",
+      network = s"${networkBW}",
       dnsServers = containerArgsConfig.dnsServers,
       dnsSearch = containerArgsConfig.dnsSearch,
       dnsOptions = containerArgsConfig.dnsOptions,

@@ -65,8 +65,8 @@ protected[core] object NetworkLimit extends ArgNormalizer[NetworkLimit] {
                 NetworkLimit(c.toInt)
             } match {
                 case Success(limit)                         => limit
-                case Failure(e. IllegalArgumentException)   => deserializationError(e.getMessage, e)
-                case Failure(e. Throwable)                  => deserializationError("bandwidth limit malformed", e)
+                case Failure(e: IllegalArgumentException)   => deserializationError(e.getMessage, e)
+                case Failure(e: Throwable)                  => deserializationError("bandwidth limit malformed", e)
             }
         }
     }

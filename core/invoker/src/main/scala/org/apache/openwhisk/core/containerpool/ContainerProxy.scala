@@ -313,7 +313,7 @@ class ContainerProxy(factory: (TransactionId,
         job.action.exec.pull,
         job.action.limits.memory.megabytes.MB,
         poolConfig.cpuShare(job.action.limits.cpu.cores, job.action.limits.memory.megabytes.MB),
-        job.action.limits.network.network,
+        job.action.limits.network.bandwidth,
         Some(job.action))
 
       // container factory will either yield a new container ready to execute the action, or

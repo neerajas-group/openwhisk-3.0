@@ -183,7 +183,8 @@ class DockerClient(dockerHost: Option[String] = None,
   
   def rateLimit(pid: ContainerPid, networkBW: Int) =
     executeProcess(
-      Seq("bash", "ratelimit_docker.out", pid.asString, networkBW)
+      Seq("bash", "ratelimit_docker.out", pid.asString, networkBW.toString),
+      scala.concurrent.duration.Duration(100, "millis")
     )
     // TODO: SIDHARTH, add logic here to handle successful and failure case based on output of the rate limiting C file.
 
