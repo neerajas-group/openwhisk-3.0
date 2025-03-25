@@ -28,9 +28,8 @@ ENV UID=1001 \
 RUN apk add --update openssl
 
 # Prasoon - Rate limiting packages installed in Invoker container
-RUN apt -y install \
+RUN apk add --update \
     iproute2 \
-    libnl-3-dev \
     libmnl-dev 
 
 # Uncomment to fetch latest version of docker instead: RUN wget -qO- https://get.docker.com | sh
