@@ -185,6 +185,7 @@ class FunctionPullingContainerProxy(
             Boolean,
             ByteSize,
             Int,
+            Int,
             Option[ExecutableWhiskAction]) => Future[Container],
   entityStore: ArtifactStore[WhiskEntity],
   namespaceBlacklist: NamespaceBlacklist,
@@ -255,7 +256,7 @@ class FunctionPullingContainerProxy(
         job.action.exec.pull,
         job.action.limits.memory.megabytes.MB,
         poolConfig.cpuShare(job.action.limits.cpu.cores, job.action.limits.memory.megabytes.MB),
-        job.action.limits.network.network,
+        job.action.limits.network.bandwidth,
         None)
         .andThen {
           case Failure(t) =>
@@ -1262,6 +1263,7 @@ object FunctionPullingContainerProxy {
                       ImageName,
                       Boolean,
                       ByteSize,
+                      Int,
                       Int,
                       Option[ExecutableWhiskAction]) => Future[Container],
             entityStore: ArtifactStore[WhiskEntity],
