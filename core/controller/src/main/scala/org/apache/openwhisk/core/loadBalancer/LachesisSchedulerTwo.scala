@@ -305,7 +305,7 @@ class LachesisSchedulerTwo(
     }
 
     // Create final action limits, action, and message for the invocation we want to run
-    val finalLimits = ActionLimits(action.limits.timeout, MemoryLimit(memSlots.MB), CpuLimit(cpuCores), action.limits.logs, action.limits.concurrency)
+    val finalLimits = ActionLimits(action.limits.timeout, MemoryLimit(memSlots.MB), CpuLimit(cpuCores), action.limits.network, action.limits.logs, action.limits.concurrency)
     val finalAction = ExecutableWhiskActionMetaData(action.namespace, 
                                                     finalFqn.name, 
                                                     action.exec, 
