@@ -267,6 +267,19 @@ trait DockerApi {
    */
   def inspectIPAddress(id: ContainerId, network: String)(implicit transid: TransactionId): Future[ContainerAddress]
 
+
+  /**
+   * Gets the PID of the container with the given id.
+   * @param id the id of the container to get the PID for
+   * @return A Future resolving to the pid
+   */
+  def getPid(id: ContainerId)(implicit transid: TransactionId): Future[ContainerPid]
+
+  /**
+   * Ratelimits the container specified by PID to network bw = NetworkBW mbit
+   */
+  def rateLimit(pid: ContainerPid, networkBW: Int): Future[String]
+
   /**
    * Pauses the container with the given id.
    *

@@ -105,6 +105,7 @@ object DockerContainer {
 
     val final_network = network.split("::")(0)
     val networkBW = network.split("::")(1)
+    val networkBWi = networkBW.toInt
 
     // NOTE: --dns-option on modern versions of docker, but is --dns-opt on docker 1.12
     val dnsOptString = if (docker.clientVersion.startsWith("1.12")) { "--dns-opt" } else { "--dns-option" }
@@ -174,9 +175,7 @@ object DockerContainer {
           docker.rm(id)
           Future.failed(WhiskContainerStartupError(Messages.resourceProvisionError))
       }
-      status <- docker.rateLimit(pid, networkBW) {
-        // TODO -- SIDHARTH, add case handling here depending on C file.
-      }
+      status <- docker.rateLimit(pid, networkBWi)
       ip <- docker.inspectIPAddress(id, network).recoverWith {
         // remove the container immediately if inspect failed as
         // we cannot recover that case automatically
