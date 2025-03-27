@@ -172,7 +172,7 @@ object DockerContainer {
           Future.failed(WhiskContainerStartupError(Messages.resourceProvisionError))
       }
       status <- docker.rateLimit(pid, networkBWi)
-      ip <- docker.inspectIPAddress(id, network).recoverWith {
+      ip <- docker.inspectIPAddress(id, s"bridge").recoverWith {
         // remove the container immediately if inspect failed as
         // we cannot recover that case automatically
         case _ =>
