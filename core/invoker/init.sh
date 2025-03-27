@@ -18,7 +18,11 @@
 
 ./copyJMXFiles.sh
 
+
 export INVOKER_OPTS
 INVOKER_OPTS="$INVOKER_OPTS $(./transformEnvironment.sh)"
+
+HOSTNAME=$(hostname)
+echo -e "\n127.0.0.1 ${HOSTNAME}" | tee -a /etc/hosts
 
 exec invoker/bin/invoker "$@"
