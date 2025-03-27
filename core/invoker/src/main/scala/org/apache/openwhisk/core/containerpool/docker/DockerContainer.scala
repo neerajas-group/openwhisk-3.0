@@ -103,9 +103,7 @@ object DockerContainer {
       case (key, valueList) => valueList.toList.flatMap(Seq(key, _))
     }
 
-    val final_network = network.split("::")(0)
-    val networkBW = network.split("::")(1)
-    val networkBWi = networkBW.toInt
+    val networkBWi = network.toInt
 
     // NOTE: --dns-option on modern versions of docker, but is --dns-opt on docker 1.12
     val dnsOptString = if (docker.clientVersion.startsWith("1.12")) { "--dns-opt" } else { "--dns-option" }
@@ -116,9 +114,7 @@ object DockerContainer {
       "--memory",
       s"${memory.toMB}m",
       "--memory-swap",
-      s"${memory.toMB}m",
-      "--network",
-      final_network) ++
+      s"${memory.toMB}m") ++
       environmentArgs ++
       dnsServers.flatMap(d => Seq("--dns", d)) ++
       dnsSearch.flatMap(d => Seq("--dns-search", d)) ++
