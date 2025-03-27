@@ -229,9 +229,14 @@ class DockerClient(dockerHost: Option[String] = None,
       logLevel = InfoLevel)
     executeProcess(cmd, timeout).andThen {
       case Success(_) => transid.finished(this, start)
-      case Failure(pte: ProcessTimeoutException) =>
+      case Failure(pte: ProcessTimeoutException) => {
+        log.info(this, s"Failed Running Command docker ${args} in DockerClient.Scala runCmd because of timeout");
         transid.failed(this, start, pte.getMessage, ErrorLevel)
-      case Failure(t) => transid.failed(this, start, t.getMessage, ErrorLevel)
+      }
+      case Failure(t) => {
+        log.info(this, s"Failed Running Command docker ${args} in DockerClient.Scala runCmd because of failure.");
+        transid.failed(this, start, t.getMessage, ErrorLevel)
+      }
     }
   }
 }
