@@ -24,12 +24,13 @@ import akka.actor.ActorSystem
 import akka.stream._
 import akka.stream.scaladsl.Framing.FramingException
 import spray.json._
+
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import org.apache.openwhisk.common.Logging
 import org.apache.openwhisk.common.TransactionId
 import org.apache.openwhisk.core.containerpool._
-import org.apache.openwhisk.core.entity.ActivationResponse.{ConnectionError, MemoryExhausted}
+import org.apache.openwhisk.core.entity.ActivationResponse.{ConnectionError, MemoryExhausted, Success}
 import org.apache.openwhisk.core.entity.{ActivationEntityLimit, ByteSize}
 import org.apache.openwhisk.core.entity.size._
 import akka.stream.scaladsl.{Framing, Source}
@@ -178,8 +179,12 @@ object DockerContainer {
         case _ =>
           docker.rm(id)
           Future.failed(WhiskContainerStartupError(Messages.resourceProvisionError))
+      }.onComplete{
+        v =>
+          log.info(this, s"Inspect IP Addr completed with ${v} as result")
       }
-    } yield new DockerContainer(id, ip, useRunc)
+
+    } yield new DockerContainer(id, ContainerAddress(ip), useRunc)
   }
 }
 
