@@ -185,13 +185,32 @@ class DockerClient(dockerHost: Option[String] = None,
       case stdout       => Future.successful(ContainerPid(stdout))
     }
   
-  def rateLimit(pid: ContainerPid, networkBW: Int) =
+  def rateLimit(pid: ContainerPid, networkBW: Int)(implicit transid: TransactionId) = {
+    val start = transid.started(
+      this,
+      LoggingMarkers.INVOKER_DOCKER_CMD("ratelimiting"),
+      s"running ratelimit with networkBw: ${networkBW} on container pid ${ContainerPid}",
+      logLevel = InfoLevel
+    )
     executeProcess(
       Seq("bash", "ratelimit_docker.out", pid.asString, networkBW.toString),
-      scala.concurrent.duration.Duration(100, "millis")
-    )
+      scala.concurrent.duration.Duration(1000, "millis")
+    ).andThen{
+      case Success(resolved) =>{
+        log.info(this, s"Successfully ratelimited container pid ${ContainerPid}, command resolved to ${resolved}")
+        transid.finished(this,start)
+      }
+      case Failure(pte: ProcessTimeoutException) => {
+        log.info(this, s"Failed ratelimiting container pid ${ContainerPid} because of timeout exception")
+        transid.failed(this, start, pte.getMessage, ErrorLevel)
+      }
+      case Failure(t) => {
+        log.info(this, s"Failed Running ratelimit container pid ${ContainerPid} in DockerClient.Scala because of failure.")
+        transid.failed(this, start, t.getMessage, ErrorLevel)
+      }
+    }
     // TODO: SIDHARTH, add logic here to handle successful and failure case based on output of the rate limiting C file.
-
+  }
   def pause(id: ContainerId)(implicit transid: TransactionId): Future[Unit] =
     runCmd(Seq("pause", id.asString), config.timeouts.pause).map(_ => ())
 
@@ -290,7 +309,7 @@ trait DockerApi {
   /**
    * Ratelimits the container specified by PID to network bw = NetworkBW mbit
    */
-  def rateLimit(pid: ContainerPid, networkBW: Int): Future[String]
+  def rateLimit(pid: ContainerPid, networkBW: Int)(implicit transid: TransactionId): Future[String]
 
   /**
    * Pauses the container with the given id.
