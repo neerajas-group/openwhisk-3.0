@@ -30,13 +30,13 @@ import scala.concurrent.duration._
 import org.apache.openwhisk.common.Logging
 import org.apache.openwhisk.common.TransactionId
 import org.apache.openwhisk.core.containerpool._
-import org.apache.openwhisk.core.entity.ActivationResponse.{ConnectionError, MemoryExhausted, Success}
+import org.apache.openwhisk.core.entity.ActivationResponse.{ConnectionError, MemoryExhausted}
 import org.apache.openwhisk.core.entity.{ActivationEntityLimit, ByteSize}
 import org.apache.openwhisk.core.entity.size._
 import akka.stream.scaladsl.{Framing, Source}
 import akka.stream.stage._
 import akka.util.ByteString
-import spray.json._
+//import spray.json._
 import org.apache.openwhisk.core.containerpool.logging.LogLine
 import org.apache.openwhisk.core.entity.ExecManifest.ImageName
 import org.apache.openwhisk.http.Messages
