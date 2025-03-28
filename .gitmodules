@@ -1,0 +1,3 @@
+[submodule "CiNeMa"]
+	path = CiNeMa
+	url = git@github.com:SysML-Group-8-SP23/CiNeMa.git
