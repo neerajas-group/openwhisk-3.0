@@ -193,7 +193,7 @@ class DockerClient(dockerHost: Option[String] = None,
       logLevel = InfoLevel
     )
     executeProcess(
-      Seq("bash", "ratelimit_docker.out", pid.asString, networkBW.toString),
+      Seq("ratelimit_docker.out", pid.asString, networkBW.toString),
       scala.concurrent.duration.Duration(1000, "millis")
     ).andThen{
       case Success(resolved) =>{
