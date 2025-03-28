@@ -169,8 +169,12 @@ class DockerClient(dockerHost: Option[String] = None,
     runCmd(
       Seq("inspect", "--format", s"{{.NetworkSettings.Networks.${network}.IPAddress}}", id.asString),
       config.timeouts.inspect).flatMap {
-      case "<no value>" => Future.failed(new NoSuchElementException)
-      case stdout       => Future.successful(ContainerAddress(stdout))
+      case "<no value>" =>
+        log.info(this, s"inspectIPAddress failed to inspect IP Address of container. Got no such element exception...")
+        Future.failed(new NoSuchElementException)
+      case stdout       =>
+        log.info(this, s"inspectIPAddress Got IP address ${stdout}")
+        Future.successful(ContainerAddress(stdout))
     }
   
   def getPid(id: ContainerId)(implicit transid: TransactionId): Future[ContainerPid] =

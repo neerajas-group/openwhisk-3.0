@@ -179,12 +179,9 @@ object DockerContainer {
         case _ =>
           docker.rm(id)
           Future.failed(WhiskContainerStartupError(Messages.resourceProvisionError))
-      }.onComplete{
-        v =>
-          log.info(this, s"Inspect IP Addr completed with ${v} as result")
       }
 
-    } yield new DockerContainer(id, ContainerAddress(ip), useRunc)
+    } yield new DockerContainer(id, ip, useRunc)
   }
 }
 
