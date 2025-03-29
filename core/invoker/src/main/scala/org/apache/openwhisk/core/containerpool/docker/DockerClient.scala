@@ -197,15 +197,15 @@ class DockerClient(dockerHost: Option[String] = None,
       scala.concurrent.duration.Duration(1000, "millis")
     ).andThen{
       case Success(resolved) =>{
-//        log.info(this, s"Successfully ratelimited container pid ${ContainerPid}, command resolved to ${resolved}")
+        log.info(this, s"Successfully ratelimited container pid ${ContainerPid}, command resolved to ${resolved}")
         transid.finished(this,start)
       }
       case Failure(pte: ProcessTimeoutException) => {
-//        log.info(this, s"Failed ratelimiting container pid ${ContainerPid} because of timeout exception")
+        log.info(this, s"Failed ratelimiting container pid ${ContainerPid} because of timeout exception")
         transid.failed(this, start, pte.getMessage, ErrorLevel)
       }
       case Failure(t) => {
-//        log.info(this, s"Failed Running ratelimit container pid ${ContainerPid} in DockerClient.Scala because of failure.")
+        log.info(this, s"Failed Running ratelimit container pid ${ContainerPid} in DockerClient.Scala because of failure.")
         transid.failed(this, start, t.getMessage, ErrorLevel)
       }
     }
@@ -252,15 +252,15 @@ class DockerClient(dockerHost: Option[String] = None,
       logLevel = InfoLevel)
     executeProcess(cmd, timeout).andThen {
       case Success(resolved) => {
-//        log.info(this, s"Successfully ran command ${cmd}, resolved to ${resolved}")
+        log.info(this, s"Successfully ran command ${cmd}, resolved to ${resolved}")
         transid.finished(this, start)
       }
       case Failure(pte: ProcessTimeoutException) => {
-//        log.info(this, s"Failed Running Command docker ${args} in DockerClient.Scala runCmd because of timeout");
+        log.info(this, s"Failed Running Command docker ${args} in DockerClient.Scala runCmd because of timeout");
         transid.failed(this, start, pte.getMessage, ErrorLevel)
       }
       case Failure(t) => {
-//        log.info(this, s"Failed Running Command docker ${args} in DockerClient.Scala runCmd because of failure.");
+        log.info(this, s"Failed Running Command docker ${args} in DockerClient.Scala runCmd because of failure.");
         transid.failed(this, start, t.getMessage, ErrorLevel)
       }
     }
