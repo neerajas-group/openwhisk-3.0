@@ -462,12 +462,12 @@ trait WhiskActionsApi extends WhiskCollectionAPI with PostActionActivation with 
       this,
       LoggingMarkers.CONTROLLER_ACTIVATION,
       s"creating action ${entityName.toDocId.asString} with limits - \n " +
-        s"timeout: ${limits.timeout} \n" +
-        s"memory: ${limits.memory} \n" +
-        s"cpu: ${limits.cpu} \n" +
-        s"network: ${limits.network} \n" +
-        s"logs: ${limits.logs} \n" +
-        s"concurrency: ${limits.concurrency} \n"
+        s"timeout: ${limits.timeout.toString} \n" +
+        s"memory: ${limits.memory.toString} \n" +
+        s"cpu: ${limits.cpu.toString} \n" +
+        s"network: ${limits.network.toString} \n" +
+        s"logs: ${limits.logs.toString} \n" +
+        s"concurrency: ${limits.concurrency.toString} \n"
     )
 
     // This is temporary while we are making sequencing directly supported in the controller.
