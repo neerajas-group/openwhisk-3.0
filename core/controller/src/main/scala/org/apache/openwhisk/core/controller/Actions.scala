@@ -29,7 +29,7 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.unmarshalling._
 import spray.json._
 import spray.json.DefaultJsonProtocol._
-import org.apache.openwhisk.common.TransactionId
+import org.apache.openwhisk.common.{LoggingMarkers, TransactionId}
 import org.apache.openwhisk.core.{FeatureFlags, WhiskConfig}
 import org.apache.openwhisk.core.controller.RestApiCommons.{ListLimit, ListSkip}
 import org.apache.openwhisk.core.controller.actions.PostActionActivation
@@ -457,6 +457,19 @@ trait WhiskActionsApi extends WhiskCollectionAPI with PostActionActivation with 
         l.logs getOrElse LogLimit(),
         l.concurrency getOrElse ConcurrencyLimit())
     } getOrElse ActionLimits()
+
+    transid.started(
+      this,
+      LoggingMarkers.CONTROLLER_ACTIVATION,
+      s"creating action ${entityName.toDocId.asString} with limits - \n " +
+        s"timeout: ${limits.timeout} \n" +
+        s"memory: ${limits.memory} \n" +
+        s"cpu: ${limits.cpu} \n" +
+        s"network: ${limits.network} \n" +
+        s"logs: ${limits.logs} \n" +
+        s"concurrency: ${limits.concurrency} \n"
+    )
+
     // This is temporary while we are making sequencing directly supported in the controller.
     // The parameter override allows this to work with Pipecode.code. Any parameters other
     // than the action sequence itself are discarded and have no effect.

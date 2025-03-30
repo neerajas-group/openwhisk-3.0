@@ -182,14 +182,17 @@ class DockerClient(dockerHost: Option[String] = None,
       Seq("inspect", "--format", s"{{.State.Pid}}", id.asString),
       config.timeouts.inspect).flatMap{
       case "<no value>" => Future.failed(new NoSuchElementException)
-      case stdout       => Future.successful(ContainerPid(stdout))
+      case stdout       => {
+        log.info(this, s"getPid Got PID ${stdout}")
+        Future.successful(ContainerPid(stdout))
+      }
     }
   
   def rateLimit(pid: ContainerPid, networkBW: Int)(implicit transid: TransactionId) = {
     val start = transid.started(
       this,
       LoggingMarkers.INVOKER_DOCKER_CMD("ratelimiting"),
-      s"running ratelimit with networkBw: ${networkBW} on container pid ${ContainerPid}",
+      s"running ratelimit with networkBw: ${networkBW} on container pid ${ContainerPid.toString()}",
       logLevel = InfoLevel
     )
     executeProcess(
