@@ -224,7 +224,25 @@ trait WhiskActionsApi extends WhiskCollectionAPI with PostActionActivation with 
             s"creating action ${entityName.toDocId.asString} with content $rawContent"
           )
 
-          val content = rawContent.parseJson.convertTo[WhiskActionPut]
+          // Parse the JSON string
+          val json = rawContent.parseJson.asJsObject
+
+          // Check for "limits" key and rename "networkBW" to "network" if it exists
+          val modifiedJson = json.fields.get("limits") match {
+            case Some(limitsObj: JsObject) if limitsObj.fields.contains("networkBW") =>
+              val updatedLimits = limitsObj.fields - "networkBW" + ("network" -> limitsObj.fields("networkBW"))
+              json.copy(fields = json.fields + ("limits" -> JsObject(updatedLimits)))
+            case _ => json
+          }
+
+          transid.started(
+            this,
+            LoggingMarkers.CONTROLLER_ACTIVATION,
+            s"creating action ${entityName.toDocId.asString} with modified content ${modifiedJson.toString()}"
+          )
+
+
+          val content = modifiedJson.convertTo[WhiskActionPut]
           val request = content.resolve(user.namespace)
           val checkAdditionalPrivileges = entitleReferencedEntities(user, Privilege.READ, request.exec).flatMap {
             case _ => entitlementProvider.check(user, content.exec)
