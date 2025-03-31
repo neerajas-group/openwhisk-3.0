@@ -216,7 +216,15 @@ trait WhiskActionsApi extends WhiskCollectionAPI with PostActionActivation with 
         s"creating action ${entityName.toDocId.asString} with uri $uri"
       )
       parameter('overwrite ? false) { overwrite =>
-        entity(as[WhiskActionPut]) { content =>
+        entity(as[String]) { rawContent =>
+
+          transid.started(
+            this,
+            LoggingMarkers.CONTROLLER_ACTIVATION,
+            s"creating action ${entityName.toDocId.asString} with content $rawContent"
+          )
+
+          val content = rawContent.parseJson.convertTo[WhiskActionPut]
           val request = content.resolve(user.namespace)
           val checkAdditionalPrivileges = entitleReferencedEntities(user, Privilege.READ, request.exec).flatMap {
             case _ => entitlementProvider.check(user, content.exec)
