@@ -209,20 +209,27 @@ trait WhiskActionsApi extends WhiskCollectionAPI with PostActionActivation with 
    * - 500 Internal Server Error
    */
   override def create(user: Identity, entityName: FullyQualifiedEntityName)(implicit transid: TransactionId) = {
-    parameter('overwrite ? false) { overwrite =>
-      entity(as[WhiskActionPut]) { content =>
-        val request = content.resolve(user.namespace)
-        val checkAdditionalPrivileges = entitleReferencedEntities(user, Privilege.READ, request.exec).flatMap {
-          case _ => entitlementProvider.check(user, content.exec)
-        }
+    extractUri { uri =>
+      transid.started(
+        this,
+        LoggingMarkers.CONTROLLER_ACTIVATION,
+        s"creating action ${entityName.toDocId.asString} with uri $uri"
+      )
+      parameter('overwrite ? false) { overwrite =>
+        entity(as[WhiskActionPut]) { content =>
+          val request = content.resolve(user.namespace)
+          val checkAdditionalPrivileges = entitleReferencedEntities(user, Privilege.READ, request.exec).flatMap {
+            case _ => entitlementProvider.check(user, content.exec)
+          }
 
-        onComplete(checkAdditionalPrivileges) {
-          case Success(_) =>
-            putEntity(WhiskAction, entityStore, entityName.toDocId, overwrite, update(user, request) _, () => {
-              make(user, entityName, request)
-            })
-          case Failure(f) =>
-            super.handleEntitlementFailure(f)
+          onComplete(checkAdditionalPrivileges) {
+            case Success(_) =>
+              putEntity(WhiskAction, entityStore, entityName.toDocId, overwrite, update(user, request) _, () => {
+                make(user, entityName, request)
+              })
+            case Failure(f) =>
+              super.handleEntitlementFailure(f)
+          }
         }
       }
     }
