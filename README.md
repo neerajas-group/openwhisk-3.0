@@ -17,6 +17,9 @@
 #
 -->
 
+*Temporary Note: If you are building / using the network bandwidth limiting version of openwhisk developed on this branch, you will have to adjust the iptables rules of your invoker hosts in order for the deployment to be successful*
+*The command to do so is as follows `sudo iptables -t nat -A PREROUTING -p tcp --dport 12001 -j REDIRECT --to-port 8080`*
+
 # OpenWhisk
 
 [![Build Status](https://travis-ci.com/apache/openwhisk.svg?branch=master)](https://travis-ci.com/github/apache/openwhisk)
